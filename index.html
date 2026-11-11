@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>SSO API Demo</title>
+  </head>
+  <body>
+    <div class="layout">
+      <main class="pane app-pane">
+        <header class="app-header">
+          <div>
+            <h1>Storefront API sign-in</h1>
+            <p id="target" class="meta"></p>
+          </div>
+          <label class="store-switch">
+            Store
+            <select id="store"></select>
+          </label>
+        </header>
+        <div id="app"></div>
+      </main>
+      <aside class="pane log-pane">
+        <header class="log-header">
+          <h2>Technical details</h2>
+          <button id="clear-log" class="link-button" type="button">Clear log</button>
+        </header>
+        <ol id="log" class="log"></ol>
+      </aside>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
