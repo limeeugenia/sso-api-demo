@@ -87,20 +87,97 @@ h2 {
   overflow-wrap: anywhere;
 }
 
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-bottom: -1px;
+  border: 1px solid transparent;
+  border-radius: 8px 8px 0 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab[aria-selected='true'] {
+  border-color: var(--border);
+  border-bottom-color: var(--bg);
+  background: var(--bg);
+  color: var(--accent);
+}
+
+.tab-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
 .store-switch {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 12px;
   font-size: 14px;
   font-weight: 600;
 }
 
-select {
+select,
+input[type='text'] {
   font: inherit;
+  font-size: 14px;
   padding: 6px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface);
+  color: var(--text);
+}
+
+.requests {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.request-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 0;
+}
+
+.request-row > .button {
+  margin-left: auto;
+}
+
+.request-path {
+  font-family: var(--mono);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.request-row input[type='text'] {
+  flex: 1 1 160px;
+  min-width: 0;
+  font-family: var(--mono);
 }
 
 .card {

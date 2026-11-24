@@ -1,10 +1,24 @@
 import { addLog, type LogSection } from './log';
 
-const PROXY_PREFIX = '/glue';
 const JSON_API = 'application/vnd.api+json';
 
+export type ApiType = 'storefront' | 'backend';
+
+export interface ApiTarget {
+  label: string;
+  url: string;
+  proxyPrefix: string;
+}
+
+export const API_TARGETS: Record<ApiType, ApiTarget> = {
+  storefront: { label: 'Storefront API', url: __GLUE_STOREFRONT_URL__, proxyPrefix: '/glue-storefront' },
+  backend: { label: 'Backend API', url: __GLUE_BACKEND_URL__, proxyPrefix: '/glue-backend' },
+};
+
 export interface GlueRequestOptions {
-  store: string;
+  api: ApiType;
+  // Storefront API only. The Backend API has no store, so it gets no `Store` header.
+  store?: string;
   resourceType?: string;
   attributes?: Record<string, unknown>;
   accessToken?: string;
@@ -17,8 +31,13 @@ export interface GlueResponse {
 }
 
 export async function glueRequest(method: 'GET' | 'POST', path: string, options: GlueRequestOptions): Promise<GlueResponse> {
-  const headers: Record<string, string> = { Accept: JSON_API, Store: options.store };
+  const target = API_TARGETS[options.api];
+  const headers: Record<string, string> = { Accept: JSON_API };
   let body: string | undefined;
+
+  if (options.api === 'storefront' && options.store) {
+    headers.Store = options.store;
+  }
 
   if (options.resourceType) {
     headers['Content-Type'] = JSON_API;
@@ -32,8 +51,9 @@ export async function glueRequest(method: 'GET' | 'POST', path: string, options:
   const request: LogSection = {
     label: 'Request',
     content: {
-      url: __GLUE_URL__ + path,
-      sentVia: `${location.origin}${PROXY_PREFIX}${path} (dev-server proxy)`,
+      api: target.label,
+      url: target.url + path,
+      sentVia: `${location.origin}${target.proxyPrefix}${path} (dev-server proxy)`,
       headers: options.accessToken ? { ...headers, Authorization: `Bearer ${shorten(options.accessToken)}` } : headers,
       ...(body !== undefined && { body: JSON.parse(body) }),
     },
@@ -42,12 +62,12 @@ export async function glueRequest(method: 'GET' | 'POST', path: string, options:
   let response: Response;
 
   try {
-    response = await fetch(PROXY_PREFIX + path, { method, headers, body });
+    response = await fetch(target.proxyPrefix + path, { method, headers, body });
   } catch (error) {
     addLog({
       kind: 'http',
       method,
-      title: path,
+      title: `${target.label} ${path}`,
       status: 0,
       durationMs: elapsedSince(startedAt),
       sections: [request, { label: 'Error', content: String(error) }],
@@ -62,7 +82,7 @@ export async function glueRequest(method: 'GET' | 'POST', path: string, options:
   addLog({
     kind: 'http',
     method,
-    title: path,
+    title: `${target.label} ${path}`,
     status: response.status,
     durationMs: elapsedSince(startedAt),
     sections: [
